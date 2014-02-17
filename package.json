@@ -28,7 +28,7 @@
     "event-stream": "~3.1.0",
     "mocha-lcov-reporter": "0.0.1",
     "istanbul": "~0.2.4",
-    "coveralls": "~2.7.1"
+    "coveralls": "~2.8.x"
   },
   "author": {
     "name": "Nicolas Froidure",
