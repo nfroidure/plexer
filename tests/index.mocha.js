@@ -4,43 +4,6 @@ var assert = require('assert')
   , Stream = require('stream')
 ;
 
-// Helpers
-function writeToStreamSync(stream, chunks) {
-  if(!chunks.length) {
-    stream.end();
-  } else {
-    stream.write(chunks.shift());
-    writeToStreamSync(stream, chunks);
-  }
-  return stream;
-}
-function writeToStream(stream, chunks) {
-  if(!chunks.length) {
-    stream.end();
-  } else {
-    setImmediate(function() {
-      stream.write(chunks.shift());
-      writeToStream(stream, chunks);
-    });
-  }
-  return stream;
-}
-function readableStream(chunks) {
-  var stream = new Stream.Readable();
-  stream._read = function() {
-    if(chunks.length) {
-      setImmediate(function() {
-        stream.push(chunks.shift());
-        if(!chunks.length) {
-          stream.push(null);
-        }
-      });
-    }
-  }
-  stream.resume();
-  return stream;
-}
-
 // Tests
 describe('Duplexer', function() {
 
@@ -153,6 +116,7 @@ describe('Duplexer', function() {
         var readable = new Stream.PassThrough()
           , writable = new Stream.PassThrough()
           , duplex = new Duplexer({reemitErrors: false}, writable, readable)
+          , errorsCount = 0
         ;
 
         // Checking writable content
@@ -163,8 +127,13 @@ describe('Duplexer', function() {
         // Checking duplex output
         duplex.pipe(es.wait(function(err, data) {
           assert.equal(data,'bibabeloola');
+          assert.equal(errorsCount, 0);
           done();
         }));
+
+        duplex.on('error', function() {
+          errorsCount++;
+        });
 
         // Catch error events
         readable.on('error', function(){})
@@ -241,6 +210,7 @@ describe('Duplexer', function() {
         duplex.write('lali');
         duplex.end();
 
+
         // Writing content to readable
         readable.write('biba');
         readable.write('beloola');
@@ -289,6 +259,7 @@ describe('Duplexer', function() {
         var readable = new Stream.PassThrough()
           , writable = new Stream.PassThrough()
           , duplex = new Duplexer({reemitErrors: false}, writable, readable)
+          , errorsCount = 0
         ;
 
         // Checking writable content
@@ -299,8 +270,13 @@ describe('Duplexer', function() {
         // Checking duplex output
         duplex.pipe(es.wait(function(err, data) {
           assert.equal(data,'bibabeloola');
+          assert.equal(errorsCount, 0);
           done();
         }));
+
+        duplex.on('error', function() {
+          errorsCount++;
+        });
 
         // Catch error events
         readable.on('error', function(){})
@@ -316,6 +292,418 @@ describe('Duplexer', function() {
         readable.write('biba');
         readable.emit('error', new Error('hip'));
         readable.write('beloola');
+        readable.end();
+
+      });
+
+    });
+
+  });
+
+  describe('in object mode', function() {
+
+    describe('and with async streams', function() {
+
+      it('should work with functionnal API', function(done) {
+        var readable = new Stream.PassThrough({objectMode: true})
+          , writable = new Stream.PassThrough({objectMode: true})
+          , duplex = Duplexer({objectMode: true}, writable, readable)
+          , wrtCount = 0
+          , dplCount = 0
+        ;
+
+        // Checking writable content
+        writable.pipe(es.map(function(data, cb) {
+          if(1 == ++wrtCount) {
+            assert.equal(data.cnt, 'oude');
+          } else {
+            assert.equal(data.cnt, 'lali');
+          }
+          cb();
+        }));
+
+        // Checking duplex output
+        duplex.pipe(es.map(function(data, cb) {
+          if(1 == ++dplCount) {
+            assert.equal(data.cnt, 'biba');
+          } else {
+            assert.equal(data.cnt, 'beloola');
+          }
+          cb();
+        })).pipe(es.wait(function(data, cb) {
+          assert.equal(wrtCount, 2);
+          assert.equal(dplCount, 2);
+          done();
+        }));
+
+        setImmediate(function() {
+          // Writing content to duplex
+          duplex.write({cnt: 'oude'});
+          duplex.write({cnt: 'lali'});
+          duplex.end();
+
+          // Writing content to readable
+          readable.write({cnt: 'biba'});
+          readable.write({cnt: 'beloola'});
+          readable.end();
+        });
+
+      });
+
+      it('should work with POO API', function(done) {
+        var readable = new Stream.PassThrough({objectMode: true})
+          , writable = new Stream.PassThrough({objectMode: true})
+          , duplex = new Duplexer({objectMode: true}, writable, readable)
+          , wrtCount = 0
+          , dplCount = 0
+        ;
+
+        // Checking writable content
+        writable.pipe(es.map(function(data, cb) {
+          if(1 == ++wrtCount) {
+            assert.equal(data.cnt, 'oude');
+          } else {
+            assert.equal(data.cnt, 'lali');
+          }
+          cb();
+        }));
+
+        // Checking duplex output
+        duplex.pipe(es.map(function(data, cb) {
+          if(1 == ++dplCount) {
+            assert.equal(data.cnt, 'biba');
+          } else {
+            assert.equal(data.cnt, 'beloola');
+          }
+          cb();
+        })).pipe(es.wait(function(data, cb) {
+          assert.equal(wrtCount, 2);
+          assert.equal(dplCount, 2);
+          done();
+        }));
+
+        setImmediate(function() {
+          // Writing content to duplex
+          duplex.write({cnt: 'oude'});
+          duplex.write({cnt: 'lali'});
+          duplex.end();
+
+          // Writing content to readable
+          readable.write({cnt: 'biba'});
+          readable.write({cnt: 'beloola'});
+          readable.end();
+        });
+
+      });
+
+      it('should reemit errors', function(done) {
+        var readable = new Stream.PassThrough({objectMode: true})
+          , writable = new Stream.PassThrough({objectMode: true})
+          , duplex = new Duplexer({objectMode: true}, writable, readable)
+          , errorsCount = 0
+          , wrtCount = 0
+          , dplCount = 0
+        ;
+
+        // Checking writable content
+        writable.pipe(es.map(function(data, cb) {
+          if(1 == ++wrtCount) {
+            assert.equal(data.cnt, 'oude');
+          } else {
+            assert.equal(data.cnt, 'lali');
+          }
+          cb();
+        }));
+
+        // Checking duplex output
+        duplex.pipe(es.map(function(data, cb) {
+          if(1 == ++dplCount) {
+            assert.equal(data.cnt, 'biba');
+          } else {
+            assert.equal(data.cnt, 'beloola');
+          }
+          cb();
+        })).pipe(es.wait(function(data, cb) {
+          assert.equal(wrtCount, 2);
+          assert.equal(dplCount, 2);
+          assert.equal(errorsCount, 2);
+          done();
+        }));
+
+        duplex.on('error', function() {
+          errorsCount++;
+        });
+
+        setImmediate(function() {
+          // Writing content to duplex
+          duplex.write({cnt: 'oude'});
+          writable.emit('error', new Error('hip'));
+          duplex.write({cnt: 'lali'});
+          duplex.end();
+
+          // Writing content to readable
+          readable.write({cnt: 'biba'});
+          readable.emit('error', new Error('hip'));
+          readable.write({cnt: 'beloola'});
+          readable.end();
+        });
+
+      });
+
+      it('should not reemit errors when option is set', function(done) {
+        var readable = new Stream.PassThrough({objectMode: true})
+          , writable = new Stream.PassThrough({objectMode: true})
+          , duplex = new Duplexer({objectMode: true, reemitErrors: false}, writable, readable)
+          , errorsCount = 0
+          , wrtCount = 0
+          , dplCount = 0
+        ;
+
+        // Checking writable content
+        writable.pipe(es.map(function(data, cb) {
+          if(1 == ++wrtCount) {
+            assert.equal(data.cnt, 'oude');
+          } else {
+            assert.equal(data.cnt, 'lali');
+          }
+          cb();
+        }));
+
+        // Checking duplex output
+        duplex.pipe(es.map(function(data, cb) {
+          if(1 == ++dplCount) {
+            assert.equal(data.cnt, 'biba');
+          } else {
+            assert.equal(data.cnt, 'beloola');
+          }
+          cb();
+        })).pipe(es.wait(function(data, cb) {
+          assert.equal(wrtCount, 2);
+          assert.equal(dplCount, 2);
+          assert.equal(errorsCount, 0);
+          done();
+        }));
+
+        duplex.on('error', function() {
+          errorsCount++;
+        });
+
+        // Catch error events
+        readable.on('error', function(){})
+        writable.on('error', function(){})
+
+        setImmediate(function() {
+          // Writing content to duplex
+          duplex.write({cnt: 'oude'});
+          writable.emit('error', new Error('hip'));
+          duplex.write({cnt: 'lali'});
+          duplex.end();
+
+          // Writing content to readable
+          readable.write({cnt: 'biba'});
+          readable.emit('error', new Error('hip'));
+          readable.write({cnt: 'beloola'});
+          readable.end();
+        });
+
+      });
+
+    });
+
+    describe('and with sync streams', function() {
+
+      it('should work with functionnal API', function(done) {
+        var readable = new Stream.PassThrough({objectMode: true})
+          , writable = new Stream.PassThrough({objectMode: true})
+          , duplex = Duplexer({objectMode: true}, writable, readable)
+          , wrtCount = 0
+          , dplCount = 0
+        ;
+
+        // Checking writable content
+        writable.pipe(es.map(function(data, cb) {
+          if(1 == ++wrtCount) {
+            assert.equal(data.cnt, 'oude');
+          } else {
+            assert.equal(data.cnt, 'lali');
+          }
+          cb();
+        }));
+
+        // Checking duplex output
+        duplex.pipe(es.map(function(data, cb) {
+          if(1 == ++dplCount) {
+            assert.equal(data.cnt, 'biba');
+          } else {
+            assert.equal(data.cnt, 'beloola');
+          }
+          cb();
+        })).pipe(es.wait(function(data, cb) {
+          assert.equal(wrtCount, 2);
+          assert.equal(dplCount, 2);
+          done();
+        }));
+
+        // Writing content to duplex
+        duplex.write({cnt: 'oude'});
+        duplex.write({cnt: 'lali'});
+        duplex.end();
+
+        // Writing content to readable
+        readable.write({cnt: 'biba'});
+        readable.write({cnt: 'beloola'});
+        readable.end();
+
+      });
+
+      it('should work with POO API', function(done) {
+        var readable = new Stream.PassThrough({objectMode: true})
+          , writable = new Stream.PassThrough({objectMode: true})
+          , duplex = new Duplexer({objectMode: true}, writable, readable)
+          , wrtCount = 0
+          , dplCount = 0
+        ;
+
+        // Checking writable content
+        writable.pipe(es.map(function(data, cb) {
+          if(1 == ++wrtCount) {
+            assert.equal(data.cnt, 'oude');
+          } else {
+            assert.equal(data.cnt, 'lali');
+          }
+          cb();
+        }));
+
+        // Checking duplex output
+        duplex.pipe(es.map(function(data, cb) {
+          if(1 == ++dplCount) {
+            assert.equal(data.cnt, 'biba');
+          } else {
+            assert.equal(data.cnt, 'beloola');
+          }
+          cb();
+        })).pipe(es.wait(function(data, cb) {
+          assert.equal(wrtCount, 2);
+          assert.equal(dplCount, 2);
+          done();
+        }));
+
+        // Writing content to duplex
+        duplex.write({cnt: 'oude'});
+        duplex.write({cnt: 'lali'});
+        duplex.end();
+
+        // Writing content to readable
+        readable.write({cnt: 'biba'});
+        readable.write({cnt: 'beloola'});
+        readable.end();
+
+      });
+
+      it('should reemit errors', function(done) {
+        var readable = new Stream.PassThrough({objectMode: true})
+          , writable = new Stream.PassThrough({objectMode: true})
+          , duplex = new Duplexer({objectMode: true}, writable, readable)
+          , errorsCount = 0
+          , wrtCount = 0
+          , dplCount = 0
+        ;
+
+        // Checking writable content
+        writable.pipe(es.map(function(data, cb) {
+          if(1 == ++wrtCount) {
+            assert.equal(data.cnt, 'oude');
+          } else {
+            assert.equal(data.cnt, 'lali');
+          }
+          cb();
+        }));
+
+        // Checking duplex output
+        duplex.pipe(es.map(function(data, cb) {
+          if(1 == ++dplCount) {
+            assert.equal(data.cnt, 'biba');
+          } else {
+            assert.equal(data.cnt, 'beloola');
+          }
+          cb();
+        })).pipe(es.wait(function(data, cb) {
+          assert.equal(wrtCount, 2);
+          assert.equal(dplCount, 2);
+          assert.equal(errorsCount, 2);
+          done();
+        }));
+
+        duplex.on('error', function() {
+          errorsCount++;
+        });
+
+        // Writing content to duplex
+        duplex.write({cnt: 'oude'});
+        writable.emit('error', new Error('hip'));
+        duplex.write({cnt: 'lali'});
+        duplex.end();
+
+        // Writing content to readable
+        readable.write({cnt: 'biba'});
+        readable.emit('error', new Error('hip'));
+        readable.write({cnt: 'beloola'});
+        readable.end();
+
+      });
+
+      it('should not reemit errors when option is set', function(done) {
+        var readable = new Stream.PassThrough({objectMode: true})
+          , writable = new Stream.PassThrough({objectMode: true})
+          , duplex = new Duplexer({objectMode: true, reemitErrors: false}, writable, readable)
+          , errorsCount = 0
+          , wrtCount = 0
+          , dplCount = 0
+        ;
+
+        // Checking writable content
+        writable.pipe(es.map(function(data, cb) {
+          if(1 == ++wrtCount) {
+            assert.equal(data.cnt, 'oude');
+          } else {
+            assert.equal(data.cnt, 'lali');
+          }
+          cb();
+        }));
+
+        // Checking duplex output
+        duplex.pipe(es.map(function(data, cb) {
+          if(1 == ++dplCount) {
+            assert.equal(data.cnt, 'biba');
+          } else {
+            assert.equal(data.cnt, 'beloola');
+          }
+          cb();
+        })).pipe(es.wait(function(data, cb) {
+          assert.equal(wrtCount, 2);
+          assert.equal(dplCount, 2);
+          assert.equal(errorsCount, 0);
+          done();
+        }));
+
+        duplex.on('error', function() {
+          errorsCount++;
+        });
+
+        // Catch error events
+        readable.on('error', function(){})
+        writable.on('error', function(){})
+
+        // Writing content to duplex
+        duplex.write({cnt: 'oude'});
+        writable.emit('error', new Error('hip'));
+        duplex.write({cnt: 'lali'});
+        duplex.end();
+
+        // Writing content to readable
+        readable.write({cnt: 'biba'});
+        readable.emit('error', new Error('hip'));
+        readable.write({cnt: 'beloola'});
         readable.end();
 
       });

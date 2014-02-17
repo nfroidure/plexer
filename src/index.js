@@ -23,8 +23,9 @@ function Duplexer(options, writableStream, readableStream) {
   } else {
     options = options || {};
   }
-  options.reemitErrors = 'boolean' === typeof options.reemitErrors
+  this._reemitErrors = 'boolean' === typeof options.reemitErrors
     ? options.reemitErrors : true;
+  delete options.reemitErrors;
 
   // Checking arguments
   if(!(writableStream instanceof Stream.Writable
@@ -42,7 +43,17 @@ function Duplexer(options, writableStream, readableStream) {
   this._writable = writableStream;
   this._readable = readableStream;
 
-  if(options.reemitErrors) {
+  // Internal state
+  this._waitDatas = false;
+  this._hasDatas = false;
+
+  if('undefined' == typeof this._readable._readableState) {
+    this._readable = (new Stream.Readable({
+      objectMode: options.objectMode || false
+    })).wrap(this._readable);
+  }
+
+  if(this._reemitErrors) {
     this._writable.on('error', function(err) {
       _self.emit('error', err);
     });
@@ -64,7 +75,10 @@ function Duplexer(options, writableStream, readableStream) {
   });
 
   this._readable.on('readable', function() {
-    _self.read(0);
+    _self._hasDatas = true;
+    if(_self._waitDatas) {
+      _self._pushAll();
+    }
   });
 
   this._readable.once('end', function() {
@@ -73,14 +87,21 @@ function Duplexer(options, writableStream, readableStream) {
 }
 
 Duplexer.prototype._read = function(n) {
+  this._waitDatas = true;
+  if(this._hasDatas) {
+    this._pushAll();
+  }
+};
+
+Duplexer.prototype._pushAll = function() {
   var _self = this, chunk;
   do {
-    chunk = _self._readable.read(n);
-    if(null === chunk || !_self.push(chunk)) {
-      break;
+    chunk = _self._readable.read();
+    if(null !== chunk) {
+      this._waitDatas = _self.push(chunk);
     }
-  } while(null !== chunk);
-  return _self.push('');
+    this._hasDatas = (null !== chunk);
+  } while(this._waitDatas && this._hasDatas);
 };
 
 Duplexer.prototype._write = function(chunk, encoding, callback) {
