@@ -25,7 +25,7 @@ function streamInstanceOf(stream) {
   return true; // Defaults to true since checking isn't possible with 0.8
 }
 
-// Inherit of Readable stream
+// Inherit of Duplex stream
 util.inherits(Duplexer, Stream.Duplex);
 
 // Constructor
