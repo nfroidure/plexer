@@ -36,6 +36,10 @@ Type: `Stream`
 
 Required. Any readable stream.
 
+## Stats
+
+[![NPM](https://nodei.co/npm/gulp-iconfont.png?downloads=true&stars=true)](https://nodei.co/npm/gulp-iconfont/)
+[![NPM](https://nodei.co/npm-dl/gulp-iconfont.png)](https://nodei.co/npm/gulp-iconfont/)
 
 ## Contributing
 Feel free to pull your code if you agree with publishing it under the MIT license.
