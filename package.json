@@ -45,5 +45,8 @@
   ],
   "bugs": {
     "url": "https://github.com/nfroidure/plexer/issues"
+  },
+  "dependencies": {
+    "readable-stream": "^1.0.26-2"
   }
 }

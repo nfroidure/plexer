@@ -1,6 +1,29 @@
-var Stream = require('stream')
+// Need to keep a ref to platform stream constructors since readable-stream
+// doens't inherit of them'
+// See: https://github.com/isaacs/readable-stream/pull/87
+var PlatformStream = require('stream')
+  , Stream = require('readable-stream')
   , util = require('util')
 ;
+
+// Helper to test instances
+function streamInstanceOf(stream) {
+  var args = [].slice(arguments, 1)
+    , curConstructor;
+  if(!(stream instanceof Stream || stream instanceof PlatformStream)) {
+    return false;
+  }
+  while(args.length) {
+    curConstructor = arg.pop();
+    if(!(stream instanceof Stream[curConstructor]
+      || 'undefined' === PlatformStream[curConstructor]
+      || stream instanceof PlatformStream[curConstructor]
+    )) {
+      return false;
+    }
+  }
+  return true; // Defaults to true since checking isn't possible with 0.8
+}
 
 // Inherit of Readable stream
 util.inherits(Duplexer, Stream.Duplex);
@@ -16,7 +39,7 @@ function Duplexer(options, writableStream, readableStream) {
   }
 
   // Mapping args
-  if(options instanceof Stream) {
+  if(streamInstanceOf(options)) {
     readableStream = writableStream;
     writableStream = options;
     options = {};
@@ -28,11 +51,10 @@ function Duplexer(options, writableStream, readableStream) {
   delete options.reemitErrors;
 
   // Checking arguments
-  if(!(writableStream instanceof Stream.Writable
-    || writableStream instanceof Stream.Duplex)) {
+  if(!streamInstanceOf(writableStream, 'Writable', 'Duplex')) {
     throw new Error('The writable stream must be an instanceof Writable or Duplex.');
   }
-  if(!(readableStream instanceof Stream.Readable)) {
+  if(!streamInstanceOf(readableStream, 'Readable')) {
     throw new Error('The readable stream must be an instanceof Readable.');
   }
 

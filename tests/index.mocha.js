@@ -1,10 +1,14 @@
 var assert = require('assert')
   , es = require('event-stream')
   , Duplexer = require('../src')
-  , Stream = require('stream')
+  , PlatformStream = require('stream')
+  , Stream = require('readable-stream')
 ;
 
 // Tests
+[PlatformStream, Stream].slice(PlatformStream.Readable ? 0 : 1)
+  .forEach(function(Stream) {
+
 describe('Duplexer', function() {
 
   describe('in binary mode', function() {
@@ -712,22 +716,6 @@ describe('Duplexer', function() {
 
   });
 
-  it('should throw an error with bad writeable stream', function() {
-    assert.throws(function() {
-      new Duplexer({}, {}, new Stream.PassThrough());
-    });
-    assert.throws(function() {
-      new Duplexer({}, new Stream.Readable(), new Stream.PassThrough());
-    });
-  });
-
-  it('should throw an error with bad readable stream', function() {
-    assert.throws(function() {
-      new Duplexer({}, new Stream.PassThrough(), {});
-    });
-    assert.throws(function() {
-      new Duplexer({}, new Stream.PassThrough(), new Stream.Writable());
-    });
-  });
+});
 
 });
