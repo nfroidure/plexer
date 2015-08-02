@@ -25,7 +25,6 @@
   ],
   "devDependencies": {
     "coveralls": "~2.10.x",
-    "event-stream": "~3.1.1",
     "istanbul": "~0.2.6",
     "mocha": "~1.18.2",
     "mocha-lcov-reporter": "0.0.1",
