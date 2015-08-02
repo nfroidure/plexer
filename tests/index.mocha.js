@@ -1,3 +1,5 @@
+'use strict';
+
 var assert = require('assert');
 var Duplexer = require('../src');
 var Stream = require('readable-stream');
@@ -118,7 +120,7 @@ describe('Duplexer', function() {
           it('should not reemit errors when option is set', function(done) {
             var readable = new Stream.PassThrough();
             var writable = new Stream.PassThrough();
-            var duplex = new Duplexer({reemitErrors: false}, writable, readable);
+            var duplex = new Duplexer({ reemitErrors: false }, writable, readable);
             var errorsCount = 0;
 
             // Checking writable content
@@ -144,8 +146,8 @@ describe('Duplexer', function() {
             });
 
             // Catch error events
-            readable.on('error', function(){})
-            writable.on('error', function(){})
+            readable.on('error', function() {});
+            writable.on('error', function() {});
 
             setImmediate(function() {
               // Writing content to duplex
@@ -168,9 +170,12 @@ describe('Duplexer', function() {
         describe('and with sync streams', function() {
 
           it('should work with functionnal API', function(done) {
+            var createDuplexStream = Duplexer;
             var readable = new Stream.PassThrough();
             var writable = new Stream.PassThrough();
-            var duplex = Duplexer({}, writable, readable);
+            var duplex = createDuplexStream({}, writable, readable);
+
+            assert(duplex instanceof Duplexer);
 
             // Checking writable content
             writable.pipe(streamtest[version].toText(function(err, text) {
@@ -280,7 +285,7 @@ describe('Duplexer', function() {
           it('should not reemit errors when option is set', function(done) {
             var readable = new Stream.PassThrough();
             var writable = new Stream.PassThrough();
-            var duplex = new Duplexer({reemitErrors: false}, writable, readable);
+            var duplex = new Duplexer({ reemitErrors: false }, writable, readable);
             var errorsCount = 0;
 
             // Checking writable content
@@ -306,8 +311,8 @@ describe('Duplexer', function() {
             });
 
             // Catch error events
-            readable.on('error', function(){})
-            writable.on('error', function(){})
+            readable.on('error', function() {});
+            writable.on('error', function() {});
 
             // Writing content to duplex
             duplex.write('oude');
@@ -339,7 +344,7 @@ describe('Duplexer', function() {
 
             var createDuplexStream = Duplexer;
             var readable = streamtest[version].fromObjects([obj1, obj2]);
-            var writable = new Stream.PassThrough({objectMode: true});
+            var writable = new Stream.PassThrough({ objectMode: true });
             var duplex = createDuplexStream({ objectMode: true }, writable, readable);
 
             assert(duplex instanceof Duplexer);
@@ -369,7 +374,7 @@ describe('Duplexer', function() {
           it('should work with functionnal API', function(done) {
 
             var readable = streamtest[version].fromObjects([obj1, obj2]);
-            var writable = new Stream.PassThrough({objectMode: true});
+            var writable = new Stream.PassThrough({ objectMode: true });
             var duplex = Duplexer.obj(writable, readable);
 
             assert(duplex instanceof Duplexer);
@@ -399,7 +404,7 @@ describe('Duplexer', function() {
           it('should work with POO API', function(done) {
 
             var readable = streamtest[version].fromObjects([obj1, obj2]);
-            var writable = new Stream.PassThrough({objectMode: true});
+            var writable = new Stream.PassThrough({ objectMode: true });
             var duplex = new Duplexer({ objectMode: true }, writable, readable);
 
             // Checking writable content
@@ -425,9 +430,9 @@ describe('Duplexer', function() {
           });
 
           it('should reemit errors', function(done) {
-            var readable = new Stream.PassThrough({objectMode: true});
-            var writable = new Stream.PassThrough({objectMode: true});
-            var duplex = new Duplexer({objectMode: true}, writable, readable);
+            var readable = new Stream.PassThrough({ objectMode: true });
+            var writable = new Stream.PassThrough({ objectMode: true });
+            var duplex = new Duplexer({ objectMode: true }, writable, readable);
             var errorsCount = 0;
 
             // Checking writable content
@@ -469,9 +474,9 @@ describe('Duplexer', function() {
           });
 
           it('should not reemit errors when option is set', function(done) {
-            var readable = new Stream.PassThrough({objectMode: true});
-            var writable = new Stream.PassThrough({objectMode: true});
-            var duplex = new Duplexer({objectMode: true, reemitErrors: false}, writable, readable);
+            var readable = new Stream.PassThrough({ objectMode: true });
+            var writable = new Stream.PassThrough({ objectMode: true });
+            var duplex = Duplexer.obj({ reemitErrors: false }, writable, readable);
             var errorsCount = 0;
 
             // Checking writable content
@@ -497,8 +502,8 @@ describe('Duplexer', function() {
             });
 
             // Catch error events
-            readable.on('error', function(){})
-            writable.on('error', function(){})
+            readable.on('error', function() {});
+            writable.on('error', function() {});
 
             setImmediate(function() {
               // Writing content to duplex
@@ -521,9 +526,12 @@ describe('Duplexer', function() {
         describe('and with sync streams', function() {
 
           it('should work with functionnal API', function(done) {
-            var readable = new Stream.PassThrough({objectMode: true});
-            var writable = new Stream.PassThrough({objectMode: true});
-            var duplex = Duplexer({objectMode: true}, writable, readable);
+            var createDuplexStream = Duplexer;
+            var readable = new Stream.PassThrough({ objectMode: true });
+            var writable = new Stream.PassThrough({ objectMode: true });
+            var duplex = createDuplexStream({ objectMode: true }, writable, readable);
+
+            assert(duplex instanceof Duplexer);
 
             // Checking writable content
             writable.pipe(streamtest[version].toObjects(function(err, objs) {
@@ -555,9 +563,9 @@ describe('Duplexer', function() {
           });
 
           it('should work with POO API', function(done) {
-            var readable = new Stream.PassThrough({objectMode: true})
-            var writable = new Stream.PassThrough({objectMode: true})
-            var duplex = new Duplexer({objectMode: true}, writable, readable);
+            var readable = new Stream.PassThrough({ objectMode: true });
+            var writable = new Stream.PassThrough({ objectMode: true });
+            var duplex = new Duplexer({ objectMode: true }, writable, readable);
 
             // Checking writable content
             writable.pipe(streamtest[version].toObjects(function(err, objs) {
@@ -589,9 +597,9 @@ describe('Duplexer', function() {
           });
 
           it('should reemit errors', function(done) {
-            var readable = new Stream.PassThrough({objectMode: true});
-            var writable = new Stream.PassThrough({objectMode: true});
-            var duplex = new Duplexer({objectMode: true}, writable, readable);
+            var readable = new Stream.PassThrough({ objectMode: true });
+            var writable = new Stream.PassThrough({ objectMode: true });
+            var duplex = new Duplexer({ objectMode: true }, writable, readable);
             var errorsCount = 0;
 
             // Checking writable content
@@ -615,24 +623,28 @@ describe('Duplexer', function() {
             duplex.on('error', function() {
               errorsCount++;
             });
-              // Writing content to duplex
-              duplex.write(obj1);
-              writable.emit('error', new Error('hip'));
-              duplex.write(obj2);
-              duplex.end();
 
-              // Writing content to readable
-              readable.write(obj3);
-              readable.emit('error', new Error('hip'));
-              readable.write(obj4);
-              readable.end();
+            // Writing content to duplex
+            duplex.write(obj1);
+            writable.emit('error', new Error('hip'));
+            duplex.write(obj2);
+            duplex.end();
+
+            // Writing content to readable
+            readable.write(obj3);
+            readable.emit('error', new Error('hip'));
+            readable.write(obj4);
+            readable.end();
 
           });
 
           it('should not reemit errors when option is set', function(done) {
-            var readable = new Stream.PassThrough({objectMode: true});
-            var writable = new Stream.PassThrough({objectMode: true});
-            var duplex = new Duplexer({objectMode: true, reemitErrors: false}, writable, readable);
+            var readable = new Stream.PassThrough({ objectMode: true });
+            var writable = new Stream.PassThrough({ objectMode: true });
+            var duplex = new Duplexer({
+              objectMode: true,
+              reemitErrors: false,
+            }, writable, readable);
             var errorsCount = 0;
 
             // Checking writable content
@@ -658,20 +670,20 @@ describe('Duplexer', function() {
             });
 
             // Catch error events
-            readable.on('error', function(){})
-            writable.on('error', function(){})
+            readable.on('error', function() {});
+            writable.on('error', function() {});
 
-              // Writing content to duplex
-              duplex.write(obj1);
-              writable.emit('error', new Error('hip'));
-              duplex.write(obj2);
-              duplex.end();
+            // Writing content to duplex
+            duplex.write(obj1);
+            writable.emit('error', new Error('hip'));
+            duplex.write(obj2);
+            duplex.end();
 
-              // Writing content to readable
-              readable.write(obj3);
-              readable.emit('error', new Error('hip'));
-              readable.write(obj4);
-              readable.end();
+            // Writing content to readable
+            readable.write(obj3);
+            readable.emit('error', new Error('hip'));
+            readable.write(obj4);
+            readable.end();
 
           });
 
