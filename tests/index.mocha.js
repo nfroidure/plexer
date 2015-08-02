@@ -311,7 +311,7 @@ describe('Duplexer', function() {
       it('should work with functionnal API', function(done) {
         var readable = new Stream.PassThrough({objectMode: true})
           , writable = new Stream.PassThrough({objectMode: true})
-          , duplex = Duplexer({objectMode: true}, writable, readable)
+          , duplex = Duplexer.obj(writable, readable)
           , wrtCount = 0
           , dplCount = 0
         ;

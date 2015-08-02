@@ -36,6 +36,10 @@ Type: `Stream`
 
 Required. Any readable stream.
 
+### plexer.obj([options], writable, readable)
+
+A shortcut for `plexer({objectMode: true})`.
+
 ## Stats
 
 [![NPM](https://nodei.co/npm/plexer.png?downloads=true&stars=true)](https://nodei.co/npm/plexer/)
@@ -43,4 +47,3 @@ Required. Any readable stream.
 
 ## Contributing
 Feel free to pull your code if you agree with publishing it under the MIT license.
-

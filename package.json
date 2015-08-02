@@ -24,11 +24,12 @@
     "pipe"
   ],
   "devDependencies": {
-    "mocha": "~1.18.2",
+    "coveralls": "~2.10.x",
     "event-stream": "~3.1.1",
-    "mocha-lcov-reporter": "0.0.1",
     "istanbul": "~0.2.6",
-    "coveralls": "~2.10.x"
+    "mocha": "~1.18.2",
+    "mocha-lcov-reporter": "0.0.1",
+    "streamtest": "^1.2.1"
   },
   "author": {
     "name": "Nicolas Froidure",
@@ -47,6 +48,7 @@
     "url": "https://github.com/nfroidure/plexer/issues"
   },
   "dependencies": {
+    "isstream": "^0.1.2",
     "readable-stream": "^1.0.26-2"
   }
 }

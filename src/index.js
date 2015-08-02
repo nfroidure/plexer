@@ -1,29 +1,6 @@
-// Need to keep a ref to platform stream constructors since readable-stream
-// doens't inherit of them'
-// See: https://github.com/isaacs/readable-stream/pull/87
-var PlatformStream = require('stream')
-  , Stream = require('readable-stream')
-  , util = require('util')
-;
-
-// Helper to test instances
-function streamInstanceOf(stream) {
-  var args = [].slice(arguments, 1)
-    , curConstructor;
-  if(!(stream instanceof Stream || stream instanceof PlatformStream)) {
-    return false;
-  }
-  while(args.length) {
-    curConstructor = arg.pop();
-    if(!(stream instanceof Stream[curConstructor]
-      || 'undefined' === PlatformStream[curConstructor]
-      || stream instanceof PlatformStream[curConstructor]
-    )) {
-      return false;
-    }
-  }
-  return true; // Defaults to true since checking isn't possible with 0.8
-}
+var isStream = require('isstream');
+var Stream = require('readable-stream');
+var util = require('util');
 
 // Inherit of Duplex stream
 util.inherits(Duplexer, Stream.Duplex);
@@ -39,7 +16,7 @@ function Duplexer(options, writableStream, readableStream) {
   }
 
   // Mapping args
-  if(streamInstanceOf(options)) {
+  if(isStream(options)) {
     readableStream = writableStream;
     writableStream = options;
     options = {};
@@ -51,10 +28,10 @@ function Duplexer(options, writableStream, readableStream) {
   delete options.reemitErrors;
 
   // Checking arguments
-  if(!streamInstanceOf(writableStream, 'Writable', 'Duplex')) {
+  if(!isStream(writableStream, 'Writable', 'Duplex')) {
     throw new Error('The writable stream must be an instanceof Writable or Duplex.');
   }
-  if(!streamInstanceOf(readableStream, 'Readable')) {
+  if(!isStream(readableStream, 'Readable')) {
     throw new Error('The readable stream must be an instanceof Readable.');
   }
 
@@ -130,5 +107,12 @@ Duplexer.prototype._write = function(chunk, encoding, callback) {
   return this._writable.write(chunk, encoding, callback);
 };
 
-module.exports = Duplexer;
+Duplexer.obj = function plexerObj(options) {
+  var firstArgumentIsAStream = isStream(options);
+  var streams = [].slice.call(arguments, firstArgumentIsAStream ? 0 : 1);
+  options = firstArgumentIsAStream ? {} : options;
+  options.objectMode = true;
+  return Duplexer.apply({}.undef, [options].concat(streams));
+};
 
+module.exports = Duplexer;
