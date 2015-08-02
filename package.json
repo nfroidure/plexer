@@ -24,11 +24,11 @@
     "pipe"
   ],
   "devDependencies": {
-    "coveralls": "~2.10.x",
+    "coveralls": "~2.11.x",
     "eslint": "^1.0.0",
-    "istanbul": "~0.2.6",
-    "mocha": "~1.18.2",
-    "mocha-lcov-reporter": "0.0.1",
+    "istanbul": "~0.3.17",
+    "mocha": "~2.2.5",
+    "mocha-lcov-reporter": "0.0.2",
     "sf-lint": "^1.0.2",
     "streamtest": "^1.2.1"
   },
@@ -50,6 +50,6 @@
   },
   "dependencies": {
     "isstream": "^0.1.2",
-    "readable-stream": "^1.0.26-2"
+    "readable-stream": "^2.0.2"
   }
 }
