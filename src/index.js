@@ -25,8 +25,9 @@ function Duplexer(options, writableStream, readableStream) {
   } else {
     options = options || {};
   }
-  this._reemitErrors = 'boolean' === typeof options.reemitErrors
-    ? options.reemitErrors : true;
+  this._reemitErrors = 'boolean' === typeof options.reemitErrors ?
+    options.reemitErrors :
+    true;
   delete options.reemitErrors;
 
   // Checking arguments
