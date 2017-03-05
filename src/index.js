@@ -1,19 +1,19 @@
 'use strict';
 
-var isStream = require('isstream');
-var Stream = require('readable-stream');
-var util = require('util');
+const isStream = require('isstream');
+const Stream = require('readable-stream');
+const util = require('util');
 
 // Inherit of Duplex stream
 util.inherits(Duplexer, Stream.Duplex);
 
 // Constructor
 function Duplexer(options, writableStream, readableStream) {
-  var _this = this;
+  const _this = this;
 
   // Ensure new were used
-  if (!(this instanceof Duplexer)) {
-    return new (Duplexer.bind.apply(Duplexer,
+  if(!(this instanceof Duplexer)) {
+    return new (Duplexer.bind.apply(Duplexer, // eslint-disable-line
       [Duplexer].concat([].slice.call(arguments, 0))));
   }
 
@@ -56,48 +56,48 @@ function Duplexer(options, writableStream, readableStream) {
   }
 
   if(this._reemitErrors) {
-    this._writable.on('error', function(err) {
+    this._writable.on('error', (err) => {
       _this.emit('error', err);
     });
-    this._readable.on('error', function(err) {
+    this._readable.on('error', (err) => {
       _this.emit('error', err);
     });
   }
 
-  this._writable.on('drain', function() {
+  this._writable.on('drain', () => {
     _this.emit('drain');
   });
 
-  this.once('finish', function() {
+  this.once('finish', () => {
     _this._writable.end();
   });
 
-  this._writable.once('finish', function() {
+  this._writable.once('finish', () => {
     _this.end();
   });
 
-  this._readable.on('readable', function() {
+  this._readable.on('readable', () => {
     _this._hasDatas = true;
     if(_this._waitDatas) {
       _this._pushAll();
     }
   });
 
-  this._readable.once('end', function() {
+  this._readable.once('end', () => {
     _this.push(null);
   });
 }
 
-Duplexer.prototype._read = function() {
+Duplexer.prototype._read = function _plexerRead() {
   this._waitDatas = true;
   if(this._hasDatas) {
     this._pushAll();
   }
 };
 
-Duplexer.prototype._pushAll = function() {
-  var _this = this;
-  var chunk;
+Duplexer.prototype._pushAll = function _plexerPushAll() {
+  const _this = this;
+  let chunk;
 
   do {
     chunk = _this._readable.read();
@@ -108,13 +108,13 @@ Duplexer.prototype._pushAll = function() {
   } while(this._waitDatas && this._hasDatas);
 };
 
-Duplexer.prototype._write = function(chunk, encoding, callback) {
+Duplexer.prototype._write = function _plexerWrite(chunk, encoding, callback) {
   return this._writable.write(chunk, encoding, callback);
 };
 
-Duplexer.obj = function plexerObj(options) {
-  var firstArgumentIsAStream = isStream(options);
-  var streams = [].slice.call(arguments, firstArgumentIsAStream ? 0 : 1);
+Duplexer.obj = function _plexerObj(options) {
+  const firstArgumentIsAStream = isStream(options);
+  const streams = [].slice.call(arguments, firstArgumentIsAStream ? 0 : 1);
 
   options = firstArgumentIsAStream ? {} : options;
   options.objectMode = true;
