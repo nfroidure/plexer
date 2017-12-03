@@ -1,3 +1,18 @@
+<a name="1.0.2"></a>
+## [1.0.2](https://github.com/nfroidure/plexer/compare/v1.0.1...v1.0.2) (2017-12-03)
+
+
+### build
+
+* **metapak-nfroidure:** Add metapak-nfroidure ([b6a45e1](https://github.com/nfroidure/plexer/commit/b6a45e1))
+
+
+### BREAKING CHANGES
+
+* **metapak-nfroidure:** Removing support for versions minors to the last LTS
+
+
+
 ### v1.0.1 (2015/09/07 08:07 +00:00)
 - [50bb4a3](https://github.com/nfroidure/plexer/commit/50bb4a32c3aced96348fc989ffd5d7041723319e) 1.0.1 (@nfroidure)
 - [11da719](https://github.com/nfroidure/plexer/commit/11da719fecee0064a2ab1621a462c38fff977de2) Updating deps + package cleanup (@nfroidure)
