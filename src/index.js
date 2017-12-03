@@ -12,29 +12,32 @@ function Duplexer(options, writableStream, readableStream) {
   const _this = this;
 
   // Ensure new were used
-  if(!(this instanceof Duplexer)) {
-    return new (Duplexer.bind.apply(Duplexer, // eslint-disable-line
-      [Duplexer].concat([].slice.call(arguments, 0))));
+  if (!(this instanceof Duplexer)) {
+    return new (Duplexer.bind.apply(
+      Duplexer, // eslint-disable-line
+      [Duplexer].concat([].slice.call(arguments, 0))
+    ))();
   }
 
   // Mapping args
-  if(isStream(options)) {
+  if (isStream(options)) {
     readableStream = writableStream;
     writableStream = options;
     options = {};
   } else {
     options = options || {};
   }
-  this._reemitErrors = 'boolean' === typeof options.reemitErrors ?
-    options.reemitErrors :
-    true;
+  this._reemitErrors =
+    'boolean' === typeof options.reemitErrors ? options.reemitErrors : true;
   delete options.reemitErrors;
 
   // Checking arguments
-  if(!isStream(writableStream, 'Writable', 'Duplex')) {
-    throw new Error('The writable stream must be an instanceof Writable or Duplex.');
+  if (!isStream(writableStream, 'Writable', 'Duplex')) {
+    throw new Error(
+      'The writable stream must be an instanceof Writable or Duplex.'
+    );
   }
-  if(!isStream(readableStream, 'Readable')) {
+  if (!isStream(readableStream, 'Readable')) {
     throw new Error('The readable stream must be an instanceof Readable.');
   }
 
@@ -49,17 +52,17 @@ function Duplexer(options, writableStream, readableStream) {
   this._waitDatas = false;
   this._hasDatas = false;
 
-  if('undefined' == typeof this._readable._readableState) {
-    this._readable = (new Stream.Readable({
+  if ('undefined' == typeof this._readable._readableState) {
+    this._readable = new Stream.Readable({
       objectMode: options.objectMode || false,
-    })).wrap(this._readable);
+    }).wrap(this._readable);
   }
 
-  if(this._reemitErrors) {
-    this._writable.on('error', (err) => {
+  if (this._reemitErrors) {
+    this._writable.on('error', err => {
       _this.emit('error', err);
     });
-    this._readable.on('error', (err) => {
+    this._readable.on('error', err => {
       _this.emit('error', err);
     });
   }
@@ -78,7 +81,7 @@ function Duplexer(options, writableStream, readableStream) {
 
   this._readable.on('readable', () => {
     _this._hasDatas = true;
-    if(_this._waitDatas) {
+    if (_this._waitDatas) {
       _this._pushAll();
     }
   });
@@ -90,7 +93,7 @@ function Duplexer(options, writableStream, readableStream) {
 
 Duplexer.prototype._read = function _plexerRead() {
   this._waitDatas = true;
-  if(this._hasDatas) {
+  if (this._hasDatas) {
     this._pushAll();
   }
 };
@@ -101,11 +104,11 @@ Duplexer.prototype._pushAll = function _plexerPushAll() {
 
   do {
     chunk = _this._readable.read();
-    if(null !== chunk) {
+    if (null !== chunk) {
       this._waitDatas = _this.push(chunk);
     }
-    this._hasDatas = (null !== chunk);
-  } while(this._waitDatas && this._hasDatas);
+    this._hasDatas = null !== chunk;
+  } while (this._waitDatas && this._hasDatas);
 };
 
 Duplexer.prototype._write = function _plexerWrite(chunk, encoding, callback) {
