@@ -1,7 +1,5 @@
 /* eslint max-nested-callbacks: 0 */
 
-'use strict';
-
 const assert = require('assert');
 const Duplexer = require('../src');
 const Stream = require('readable-stream');

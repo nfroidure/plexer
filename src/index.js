@@ -1,5 +1,3 @@
-'use strict';
-
 const isStream = require('isstream');
 const Stream = require('readable-stream');
 const util = require('util');
