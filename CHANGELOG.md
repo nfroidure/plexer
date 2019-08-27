@@ -1,3 +1,7 @@
+# [2.0.0](https://github.com/nfroidure/plexer/compare/v1.0.3...v2.0.0) (2019-08-27)
+
+
+
 <a name="1.0.3"></a>
 ## [1.0.3](https://github.com/nfroidure/plexer/compare/v1.0.2...v1.0.3) (2019-08-27)
 
