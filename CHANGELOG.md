@@ -1,3 +1,17 @@
+# [3.0.0](https://github.com/nfroidure/plexer/compare/v2.0.0...v3.0.0) (2024-07-18)
+
+
+### Code Refactoring
+
+* **core:** switch to TypeScript ([dfb5ea2](https://github.com/nfroidure/plexer/commit/dfb5ea2bf7e146bf0411b1fddd92b92ac877e10a))
+
+
+### BREAKING CHANGES
+
+* **core:** Requires ESM, API breaking changes, requires Node20+.
+
+
+
 # [2.0.0](https://github.com/nfroidure/plexer/compare/v1.0.3...v2.0.0) (2019-08-27)
 
 
