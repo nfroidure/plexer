@@ -1,15 +1,25 @@
-import { Duplex, Readable, Writable, Stream } from 'node:stream';
+import {
+  Duplex,
+  Readable,
+  Writable,
+  Stream,
+  type DuplexOptions,
+} from 'node:stream';
 import { YError } from 'yerror';
 
 export type DuplexerOptions = {
   reemitErrors: boolean;
-  objectMode: boolean;
-};
+} & Pick<
+  DuplexOptions,
+  'objectMode' | 'writableObjectMode' | 'readableObjectMode'
+>;
 export type DuplexerWritable = Writable | Duplex;
 
-const DEFAULT_DUPLEXER_OPTIONS = {
+const DEFAULT_DUPLEXER_OPTIONS: DuplexerOptions = {
   reemitErrors: true,
   objectMode: false,
+  writableObjectMode: false,
+  readableObjectMode: false,
 };
 
 /**
@@ -19,10 +29,10 @@ class Duplexer extends Duplex {
   private _options: DuplexerOptions;
   private _writable: DuplexerWritable;
   private _readable: Readable;
-  private _waitDatas: boolean = false;
-  private _hasDatas: boolean = false;
+  private _waitDatas = false;
+  private _hasDatas = false;
   constructor(
-    options: Partial<DuplexerOptions>,
+    options: Partial<DuplexerOptions> & DuplexOptions,
     writableStream: DuplexerWritable,
     readableStream: Readable,
   );
@@ -35,7 +45,9 @@ class Duplexer extends Duplex {
    * @return Duplexer
    */
   constructor(
-    optionsOrWritableStream: Partial<DuplexerOptions> | DuplexerWritable,
+    optionsOrWritableStream:
+      | (Partial<DuplexerOptions> & DuplexOptions)
+      | DuplexerWritable,
     writableStreamOrReadableStream: DuplexerWritable | Readable,
     maybeReadableStream?: Readable,
   ) {
@@ -56,26 +68,33 @@ class Duplexer extends Duplex {
         : (maybeReadableStream as Readable);
 
     if (
-      !(writableStream instanceof Writable || writableStream instanceof Duplex)
+      !(
+        writableStream instanceof Writable ||
+        (writableStream as unknown) instanceof Duplex
+      )
     ) {
-      throw new YError('E_BAD_WRITABLE_STREAM', typeof writableStream);
+      throw new YError('E_BAD_WRITABLE_STREAM', [typeof writableStream]);
     }
     if (!(readableStream instanceof Readable)) {
-      throw new YError('E_BAD_READABLE_STREAM', typeof readableStream);
+      throw new YError('E_BAD_READABLE_STREAM', [typeof readableStream]);
     }
 
-    const superOptions: Partial<DuplexerOptions> = { ...options };
-    delete superOptions.reemitErrors;
+    const { reemitErrors, ...superOptions } = {
+      ...options,
+    };
 
     super(superOptions);
 
-    this._options = options;
+    this._options = {
+      ...options,
+      reemitErrors: reemitErrors || false,
+    };
     this._writable = writableStream;
     this._readable = readableStream;
 
     if ('undefined' == typeof this._readable.readableFlowing) {
       this._readable = new Readable({
-        objectMode: options.objectMode || false,
+        objectMode: options.objectMode || options.readableObjectMode || false,
       }).wrap(this._readable);
     }
 
@@ -131,7 +150,7 @@ class Duplexer extends Duplex {
     } while (this._waitDatas && this._hasDatas);
   }
 
-  _write(chunk, encoding, callback) {
+  _write(chunk: Buffer, encoding: BufferEncoding, callback: () => void) {
     return this._writable.write(chunk, encoding, callback);
   }
 }

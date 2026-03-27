@@ -10,7 +10,7 @@ import {
 describe('Duplexer', () => {
   describe('in binary mode', () => {
     describe('and with async streams', () => {
-      test('should work with functionnal API', async () => {
+      test('should work with functional API', async () => {
         const readable = streamtest.fromChunks([
           Buffer.from('biba'),
           Buffer.from('beloola'),
@@ -59,7 +59,7 @@ describe('Duplexer', () => {
         expect(await duplexResult).toEqual('bibabeloola');
       });
 
-      test('should reemit errors', async () => {
+      test('should re-emit errors', async () => {
         const readable = new PassThrough();
         const writable = new PassThrough();
         const duplex = new Duplexer(writable, readable);
@@ -96,7 +96,7 @@ describe('Duplexer', () => {
         expect(errorsCount).toEqual(2);
       });
 
-      test('should not reemit errors when option is set', async () => {
+      test('should not re-emit errors when option is set', async () => {
         const readable = new PassThrough();
         const writable = new PassThrough();
         const duplex = new Duplexer(
@@ -119,8 +119,8 @@ describe('Duplexer', () => {
         });
 
         // Catch error events
-        readable.on('error', () => {});
-        writable.on('error', () => {});
+        readable.on('error', () => undefined);
+        writable.on('error', () => undefined);
 
         setImmediate(() => {
           // Writing content to duplex
@@ -143,7 +143,7 @@ describe('Duplexer', () => {
     });
 
     describe('and with sync streams', () => {
-      test('should work with functionnal API', async () => {
+      test('should work with functional API', async () => {
         const readable = new PassThrough();
         const writable = new PassThrough();
         const duplex = createDuplexer({}, writable, readable);
@@ -199,7 +199,7 @@ describe('Duplexer', () => {
         expect(await duplexResult).toEqual('bibabeloola');
       });
 
-      test('should reemit errors', async () => {
+      test('should re-emit errors', async () => {
         const readable = new PassThrough();
         const writable = new PassThrough();
         const duplex = new Duplexer(writable, readable);
@@ -234,7 +234,7 @@ describe('Duplexer', () => {
         expect(await writableResult).toEqual('oudelali');
       });
 
-      test('should not reemit errors when option is set', async () => {
+      test('should not re-emit errors when option is set', async () => {
         const readable = new PassThrough();
         const writable = new PassThrough();
         const duplex = new Duplexer(
@@ -257,8 +257,8 @@ describe('Duplexer', () => {
         });
 
         // Catch error events
-        readable.on('error', () => {});
-        writable.on('error', () => {});
+        readable.on('error', () => undefined);
+        writable.on('error', () => undefined);
 
         // Writing content to duplex
         duplex.write('oude');
@@ -286,7 +286,7 @@ describe('Duplexer', () => {
     const obj4 = { cnt: 'beloola' };
 
     describe('and with async streams', () => {
-      test('should work with functionnal API', async () => {
+      test('should work with functional API', async () => {
         const readable = streamtest.fromObjects([obj1, obj2]);
         const writable = new PassThrough({ objectMode: true });
         const duplex = createDuplexer({ objectMode: true }, writable, readable);
@@ -307,7 +307,7 @@ describe('Duplexer', () => {
         expect(await duplexResult).toEqual([obj1, obj2]);
       });
 
-      test('should work with functionnal API', async () => {
+      test('should work with functional API', async () => {
         const readable = streamtest.fromObjects([obj1, obj2]);
         const writable = new PassThrough({ objectMode: true });
         const duplex = createObjectsDuplexer(writable, readable);
@@ -347,7 +347,7 @@ describe('Duplexer', () => {
         expect(await duplexResult).toEqual([obj1, obj2]);
       });
 
-      test('should reemit errors', async () => {
+      test('should re-emit errors', async () => {
         const readable = new PassThrough({ objectMode: true });
         const writable = new PassThrough({ objectMode: true });
         const duplex = new Duplexer({ objectMode: true }, writable, readable);
@@ -384,7 +384,7 @@ describe('Duplexer', () => {
         expect(errorsCount).toEqual(2);
       });
 
-      test('should not reemit errors when option is set', async () => {
+      test('should not re-emit errors when option is set', async () => {
         const readable = new PassThrough({ objectMode: true });
         const writable = new PassThrough({ objectMode: true });
         const duplex = createObjectsDuplexer(
@@ -407,8 +407,8 @@ describe('Duplexer', () => {
         });
 
         // Catch error events
-        readable.on('error', () => {});
-        writable.on('error', () => {});
+        readable.on('error', () => undefined);
+        writable.on('error', () => undefined);
 
         setImmediate(() => {
           // Writing content to duplex
@@ -431,7 +431,7 @@ describe('Duplexer', () => {
     });
 
     describe('and with sync streams', () => {
-      test('should work with functionnal API', async () => {
+      test('should work with functional API', async () => {
         const readable = new PassThrough({ objectMode: true });
         const writable = new PassThrough({ objectMode: true });
         const duplex = createDuplexer({ objectMode: true }, writable, readable);
@@ -487,7 +487,7 @@ describe('Duplexer', () => {
         expect(await duplexResult).toEqual([obj3, obj4]);
       });
 
-      test('should reemit errors', async () => {
+      test('should re-emit errors', async () => {
         const readable = new PassThrough({ objectMode: true });
         const writable = new PassThrough({ objectMode: true });
         const duplex = new Duplexer({ objectMode: true }, writable, readable);
@@ -522,7 +522,7 @@ describe('Duplexer', () => {
         expect(errorsCount).toEqual(2);
       });
 
-      test('should not reemit errors when option is set', async () => {
+      test('should not re-emit errors when option is set', async () => {
         const readable = new PassThrough({ objectMode: true });
         const writable = new PassThrough({ objectMode: true });
         const duplex = new Duplexer(
@@ -548,8 +548,8 @@ describe('Duplexer', () => {
         });
 
         // Catch error events
-        readable.on('error', () => {});
-        writable.on('error', () => {});
+        readable.on('error', () => undefined);
+        writable.on('error', () => undefined);
 
         // Writing content to duplex
         duplex.write(obj1);
@@ -566,6 +566,71 @@ describe('Duplexer', () => {
         expect(await writableResult).toEqual([obj1, obj2]);
         expect(await duplexResult).toEqual([obj3, obj4]);
         expect(errorsCount).toEqual(0);
+      });
+    });
+  });
+
+  describe('in hybrid mode', () => {
+    describe('and with async streams', () => {
+      test('should work readable in object mode and writable in chunk mode', async () => {
+        const readable = streamtest.fromObjects([{ test: 1 }, { test: 2 }]);
+        const writable = new PassThrough();
+        const duplex = createDuplexer(
+          {
+            readableObjectMode: true,
+            writableObjectMode: false,
+          },
+          writable,
+          readable,
+        );
+
+        expect(duplex instanceof Duplexer).toBeTruthy();
+
+        // Checking writable content
+        const [writableStream, writableResult] = streamtest.toText();
+        writable.pipe(writableStream);
+
+        // Checking duplex output
+        const [duplexStream, duplexResult] = streamtest.toObjects();
+        duplex.pipe(duplexStream);
+
+        streamtest
+          .fromChunks([Buffer.from('oude'), Buffer.from('lali')])
+          .pipe(duplex);
+        expect(await duplexResult).toEqual([{ test: 1 }, { test: 2 }]);
+        expect(await writableResult).toEqual('oudelali');
+      });
+
+      test('should work readable in chunk mode and writable in object mode', async () => {
+        const readable = streamtest.fromChunks([
+          Buffer.from('oude'),
+          Buffer.from('lali'),
+        ]);
+        const writable = new PassThrough({ objectMode: true });
+        const duplex = createDuplexer(
+          {
+            readableObjectMode: false,
+            writableObjectMode: true,
+          },
+          writable,
+          readable,
+        );
+
+        expect(duplex instanceof Duplexer).toBeTruthy();
+
+        // Checking writable content
+        const [writableStream, writableResult] = streamtest.toObjects();
+
+        writable.pipe(writableStream);
+
+        // Checking duplex output
+        const [duplexStream, duplexResult] = streamtest.toText();
+
+        duplex.pipe(duplexStream);
+
+        streamtest.fromObjects([{ test: 1 }, { test: 2 }]).pipe(duplex);
+        expect(await duplexResult).toEqual('oudelali');
+        expect(await writableResult).toEqual([{ test: 1 }, { test: 2 }]);
       });
     });
   });
