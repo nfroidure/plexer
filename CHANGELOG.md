@@ -1,3 +1,5 @@
+## [4.0.1](https://github.com/nfroidure/plexer/compare/v4.0.0...v4.0.1) (2026-04-07)
+
 # [4.0.0](https://github.com/nfroidure/plexer/compare/v3.0.0...v4.0.0) (2026-03-27)
 
 # [3.0.0](https://github.com/nfroidure/plexer/compare/v2.0.0...v3.0.0) (2024-07-18)

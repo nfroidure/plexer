@@ -23,7 +23,7 @@
     }
   },
   "name": "plexer",
-  "version": "4.0.0",
+  "version": "4.0.1",
   "description": "Create a duplex stream from a readable and a writable stream.",
   "homepage": "https://github.com/nfroidure/plexer",
   "main": "dist/index.js",
