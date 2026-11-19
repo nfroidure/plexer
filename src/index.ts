@@ -46,8 +46,7 @@ class Duplexer extends Duplex {
    */
   constructor(
     optionsOrWritableStream:
-      | (Partial<DuplexerOptions> & DuplexOptions)
-      | DuplexerWritable,
+      (Partial<DuplexerOptions> & DuplexOptions) | DuplexerWritable,
     writableStreamOrReadableStream: DuplexerWritable | Readable,
     maybeReadableStream?: Readable,
   ) {
@@ -67,12 +66,10 @@ class Duplexer extends Duplex {
         ? (writableStreamOrReadableStream as Readable)
         : (maybeReadableStream as Readable);
 
-    if (
-      !(
-        writableStream instanceof Writable ||
-        (writableStream as unknown) instanceof Duplex
-      )
-    ) {
+    if (!(
+      writableStream instanceof Writable ||
+      (writableStream as unknown) instanceof Duplex
+    )) {
       throw new YError('E_BAD_WRITABLE_STREAM', [typeof writableStream]);
     }
     if (!(readableStream instanceof Readable)) {
@@ -100,10 +97,14 @@ class Duplexer extends Duplex {
 
     if (this._options.reemitErrors) {
       this._writable.on('error', (err) => {
-        this.emit('error', err);
+        if (err !== this.errored) {
+          this.emit('error', err);
+        }
       });
       this._readable.on('error', (err) => {
-        this.emit('error', err);
+        if (err !== this.errored) {
+          this.emit('error', err);
+        }
       });
     }
 

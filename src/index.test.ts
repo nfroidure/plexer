@@ -1,11 +1,12 @@
 import { describe, test, expect } from '@jest/globals';
-import { PassThrough } from 'node:stream';
+import { PassThrough, Writable } from 'node:stream';
 import streamtest from 'streamtest';
 import {
   Duplexer,
   createDuplexer,
   createObjectsDuplexer,
 } from '../src/index.js';
+import { YError } from 'yerror';
 
 describe('Duplexer', () => {
   describe('in binary mode', () => {
@@ -63,7 +64,7 @@ describe('Duplexer', () => {
         const readable = new PassThrough();
         const writable = new PassThrough();
         const duplex = new Duplexer(writable, readable);
-        let errorsCount = 0;
+        const errors: string[] = [];
 
         // Checking writable content
         const [writableStream, writableResult] = streamtest.toText();
@@ -73,27 +74,48 @@ describe('Duplexer', () => {
         const [duplexStream, duplexResult] = streamtest.toText();
         duplex.pipe(duplexStream);
 
-        duplex.on('error', () => {
-          errorsCount++;
+        duplex.on('error', (err: YError) => {
+          errors.push(err.code);
         });
 
         setImmediate(() => {
           // Writing content to duplex
           duplex.write('oude');
-          writable.emit('error', new Error('hip'));
+          writable.emit('error', new YError('hip'));
           duplex.write('lali');
           duplex.end();
 
           // Writing content to readable
           readable.write('biba');
-          readable.emit('error', new Error('hip'));
+          readable.emit('error', new YError('hop'));
           readable.write('beloola');
           readable.end();
         });
 
         expect(await writableResult).toEqual('oudelali');
         expect(await duplexResult).toEqual('bibabeloola');
-        expect(errorsCount).toEqual(2);
+        expect(errors).toEqual(['hip', 'hop']);
+      });
+
+      test('should re-emit errors once', async () => {
+        const writable = new Writable({
+          write(_, __, cb) {
+            cb(new YError('hep'));
+          },
+        });
+        const duplex = new Duplexer(writable, new PassThrough());
+        const errors: string[] = [];
+
+        duplex.on('error', (err: YError) => {
+          errors.push(err.code);
+        });
+
+        duplex.write('oude');
+        duplex.end();
+
+        await new Promise<void>((resolve) => setImmediate(resolve));
+
+        expect(errors).toEqual(['hep']);
       });
 
       test('should not re-emit errors when option is set', async () => {
