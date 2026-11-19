@@ -1,3 +1,9 @@
+## [4.0.2](https://github.com/nfroidure/plexer/compare/v4.0.1...v4.0.2) (2026-11-19)
+
+### Bug Fixes
+
+* **errors:** ensure reemitting once ([917c860](https://github.com/nfroidure/plexer/commit/917c8608d4d9a0f2e846ce78a490626f3a40489a)), closes [#22](https://github.com/nfroidure/plexer/issues/22)
+
 ## [4.0.1](https://github.com/nfroidure/plexer/compare/v4.0.0...v4.0.1) (2026-04-07)
 
 # [4.0.0](https://github.com/nfroidure/plexer/compare/v3.0.0...v4.0.0) (2026-03-27)
